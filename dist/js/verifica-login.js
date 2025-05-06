@@ -11,7 +11,7 @@
             await $("#avatar").css('background-image','url(./static/avatars/8_orgid_'+userId+'.jfif)');
 
         } else {
-                window.location.assign('./');
+                window.location.assign('./verificacao-usuario');
         }
 })();
 
