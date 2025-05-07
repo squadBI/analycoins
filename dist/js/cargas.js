@@ -27,32 +27,25 @@ function tranforma_data_iso(dataHora) {
 (async function () {
     dados = Array(0);
 
-    // Para pegar o valor desse item
-    usuario = localStorage.getItem('usuario');
+    userId = localStorage.getItem('userId');
     email = localStorage.getItem('email');
-    tipo = localStorage.getItem('tipo');
-    posicao = localStorage.getItem('posicao');
-    acessos_segmento = localStorage.getItem('acessos_segmento');
+    usuario = localStorage.getItem('usuario');
 
-    await $("#usuario").text(usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1]);
-    await $("#posicao").text(posicao);
+    usuario_nome_compacto = usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1];
 
-    await carrega_cargas(email);
+    await carrega_associados_aptos();
 
 })();
 
-async function carrega_cargas(input_email){
-    var url = 'https://prod-115.westus.logic.azure.com:443/workflows/4ff98d91bce14c8c99312c952c25ea44/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=kEVbGgYZ5djj0cWz9uEzP00ZgcnNqZgAvq-SiQFEkAQ';
+async function carrega_associados_aptos(){
+    
+    var url = 'https://prod-13.westus.logic.azure.com:443/workflows/33f2b697599f43bbb2feb880995d6afa/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_yc3eSZUh6sEGxZoKMQeNahrfG3SWjkOq_gWroyaE-M';
 
     var login_data = {
-        solicitacao: "listar_tabela",
-        tabela: "ponderacao_cargas",
-        hash: "1348f1ed93616d59f6d6",
-        email: input_email,
-        x_api_key: "1348f1ed93616d59f6d62eb7631ae137cc902fc9cc4bb22428a384c1cec91c20"
+        
     };
 
-    await fetch(url,{
+    fetch(url,{
         method: 'POST',
         headers: {
             "Content-Type": "application/json"
@@ -62,64 +55,10 @@ async function carrega_cargas(input_email){
         .then(response => response.json())
         .then(data => {
             dados = JSON.parse(data.result);
-            var num_tabelas=dados.length;
-            var num_consultas=0;
-            var num_tabelas_s3=0;
-            var num_tabelas_query=0;
-            var icone_carga = '';
-            $("#logs_execucao").html('');
+            dados = dados.value;
             for(i=0; i<dados.length; i++){
-                if(dados[i].tipo_fonte=='SQL'){
-                    num_consultas++;
-                    icone_carga = '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-sql"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M18 15v6h2" /><path d="M13 15a2 2 0 0 1 2 2v2a2 2 0 1 1 -4 0v-2a2 2 0 0 1 2 -2z" /><path d="M14 20l1.5 1.5" /></svg>';
-                }
-                if(dados[i].tipo_fonte=='S3'){
-                    num_tabelas_s3++;
-                    icone_carga = '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-xls"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M4 15l4 6" /><path d="M4 21l4 -6" /><path d="M17 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75" /><path d="M11 15v6h3" /></svg>';
-                }
-                if(dados[i].tipo_fonte=='CONSULTA'){
-                    num_tabelas_query++;
-                    icone_carga = '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-google-big-query"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17.73 19.875a2.225 2.225 0 0 1 -1.948 1.125h-7.283a2.222 2.222 0 0 1 -1.947 -1.158l-4.272 -6.75a2.269 2.269 0 0 1 0 -2.184l4.272 -6.75a2.225 2.225 0 0 1 1.946 -1.158h7.285c.809 0 1.554 .443 1.947 1.158l3.98 6.75a2.33 2.33 0 0 1 0 2.25l-3.98 6.75v-.033z" /><path d="M11.5 11.5m-3.5 0a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0" /><path d="M14 14l2 2" /></svg>';
-                }
-
-                var active = '';
-                if(i==0){
-                    active = 'active';
-                    var id_linha_calculo=dados[i].id;
-                }
-
-                var data_formatada = tranforma_data_iso(dados[i].data_execucao);
-                $("#logs_execucao").append('<li class="step-item">'+
-                        '<div class="h4 m-0">'+dados[i].nome_tabela+'</div>'+
-                        '<div class="text-muted">'+data_formatada+'</div>'+
-                      '</li>');
-
-                $("#dados_cargas").append('<div onclick="carrega_info_cargas('+dados[i].id+')" class="list-group list-group-flush cursor-seleciona-carga">'+
-                                            '<div id="info_carga_active'+dados[i].id+'" class="list-group-item '+active+'">'+
-                                                '<div class="row align-items-center">'+
-                                                  '<div class="col-auto"><input type="checkbox" class="form-check-input"></div>'+
-                                                  '<div class="col-auto">'+
-                                                    '<a>'+
-                                                      '<span class="avatar">'+
-                                                      icone_carga+
-                                                      '</span>'+
-                                                    '</a>'+
-                                                  '</div>'+
-                                                  '<div class="col text-truncate">'+
-                                                    '<a class="text-reset d-block">'+dados[i].nome_tabela+'</a>'+
-                                                    '<div class="d-block text-muted text-truncate mt-n1">'+dados[i].bucket_banco+'</div>'+
-                                                  '</div>'+
-                                                '</div>'+
-                                              '</div>'+
-                                            '</div>');
-
+                $("#associados_aptos").append('<option value="'+dados[i].userId+'">'+dados[i].displayName.toUpperCase()+'</option>');
             }
-            $("#num_tabelas").text(num_tabelas);
-            $("#num_consultas").text(num_consultas);
-            $("#num_tabelas_s3").text(num_tabelas_s3);
-            $("#num_tabelas_query").text(num_tabelas_query);
-            carrega_info_cargas(id_linha_calculo);
-
         })
         .catch(error => {
             console.log('problema na conexão com a api');
