@@ -2,6 +2,12 @@ function sleep(ms) {
           return new Promise(resolve => setTimeout(resolve, ms));
       }
 
+function generateRandomHash(length) {
+    const array = new Uint8Array(length / 2);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
 function tranforma_data_iso(dataHora) {
             // Data no formato ISO 8601
             const isoDate = dataHora;
@@ -67,6 +73,8 @@ async function carrega_associados_aptos(){
             dados = dados.value;
             for(i=0; i<dados.length; i++){
                 $("#associados_aptos").append('<option value="'+dados[i].userId+'">'+dados[i].displayName.toUpperCase()+'</option>');
+                $("#associados_aptos_1").append('<option value="'+dados[i].userId+'">'+dados[i].displayName.toUpperCase()+'</option>');
+                $("#associados_aptos_2").append('<option value="'+dados[i].userId+'">'+dados[i].displayName.toUpperCase()+'</option>');
             }
         })
         .catch(error => {
@@ -194,3 +202,52 @@ async function carrega_saldo(){
 
     await $("#saldo_usuario").text(saldo_usuario);
 }
+
+$("#salvar_reconhecimento_1").click(async function(){
+
+    hash_gerada_randomicamente = generateRandomHash(32); // Gera uma hash de 32 caracteres
+
+    var comportamento = '';
+
+    for(i=0; i<$("input[name='comportamento']").length; i++){
+        if($("input[name='comportamento']")[i].checked){
+            comportamento = $("input[name='comportamento']")[i].value;
+        }
+    }
+
+   var url = 'https://prod-175.westus.logic.azure.com:443/workflows/5d462d9735984dcb90286653ea7f3b56/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hF4G6uAq2KSYnb24Plug1jn-kOQqH6Jr-urJhPcvYZo';
+
+    var login_data = {
+    "id_transacao": hash_gerada_randomicamente,
+    "userId_presente": userId,
+    "analycoins": 10,
+    "userId_recebeu": $("#associados_aptos").val(), 
+    "comportamento": comportamento,
+    "msg_reconhecimento": $("#reconhecimento").val() 
+};
+
+    await fetch(url,{
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(login_data)
+    })
+        .then(response => response.json())
+        .then(data => {
+        })
+        .catch(error => {
+            console.log('problema na conexão com a api');
+        })
+
+    $("#page_loader").show();
+    $("#pagina_principal").hide();
+
+    await sleep(15000);
+    window.location.reload(); 
+  
+});
+
+$("#salvar_reconhecimento_2").click(async function(){
+  
+});
