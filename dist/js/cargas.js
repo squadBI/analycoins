@@ -28,6 +28,7 @@ function tranforma_data_iso(dataHora) {
     dados = Array(0);
     analycoins_principal = Array(0);
     analycoins_transacoes = Array(0);
+    saldo_usuario=0;
 
     userId = localStorage.getItem('userId');
     email = localStorage.getItem('email');
@@ -37,8 +38,10 @@ function tranforma_data_iso(dataHora) {
 
     await carrega_associados_aptos();
     await carrega_info_analycoins();
-    await sleep(1000);
+    await sleep(3000);
     await carrega_info_transacoes();
+    await sleep(3000);
+    await carrega_saldo();
 
 })();
 
@@ -89,7 +92,6 @@ async function carrega_info_analycoins(){
         .then(response => response.json())
         .then(data => {
             analycoins_principal = JSON.parse(data.resultado);
-            console.log(analycoins_principal);
         })
         .catch(error => {
             console.log('problema na conexão com a api');
@@ -98,7 +100,7 @@ async function carrega_info_analycoins(){
 }
 
 
-async function carrega_info_transacoes(principal){
+async function carrega_info_transacoes(){
 
     var url = 'https://prod-161.westus.logic.azure.com:443/workflows/4504ac120c7948e2b6c21667b2057ed3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=WYWD7cyILHEEe50QpvzqyW2JX6y3PBkiJiBu0utgJZI';
 
@@ -146,317 +148,45 @@ async function carrega_info_transacoes(principal){
 
 }
 
-async function exibe_campos_joins(qtd_joins){
-        var opcoes_campos_existentes = Array(0);
-        $("#exibe_campos_joins").html('');
-
-        if(qtd_joins!=0 || qtd_joins!='0'){
-            for(j=0 ; j<qtd_joins; j++){
-                opcoes_campos_existentes[j] = '<div class="mb-3">'+
-                  '<label class="form-label">Left '+(j+1)+'</label>'+
-                  '<select id="campo_join_'+(j+1)+'" class="form-select">';
-        
-                for(i=0;i<dados.length;i++){
-                    opcoes_campos_existentes[j]=opcoes_campos_existentes[j]+'<option value="'+dados[i].nome_tabela+'" selected>'+dados[i].nome_tabela+'</option>'
-                }
-
-                opcoes_campos_existentes[j]=opcoes_campos_existentes[j]+'</select>'+
-                        '</div>';
-                $("#exibe_campos_joins").append(opcoes_campos_existentes[j]);
-            }
-        }
-
-}
-
-async function exibe_campos_joins_update(qtd_joins){
-        var opcoes_campos_existentes_update = Array(0);
-        $("#exibe_campos_joins_update").html('');
-
-        if(qtd_joins!=0 || qtd_joins!='0'){
-            for(j=0 ; j<qtd_joins; j++){
-                opcoes_campos_existentes_update[j] = '<div class="mb-3">'+
-                  '<label class="form-label">Left '+(j+1)+'</label>'+
-                  '<select id="campo_join_'+(j+1)+'_update" class="form-select">';
-        
-                for(i=0;i<dados.length;i++){
-                    opcoes_campos_existentes_update[j]=opcoes_campos_existentes_update[j]+'<option value="'+dados[i].nome_tabela+'" selected>'+dados[i].nome_tabela+'</option>'
-                }
-
-                opcoes_campos_existentes_update[j]=opcoes_campos_existentes_update[j]+'</select>'+
-                        '</div>';
-                $("#exibe_campos_joins_update").append(opcoes_campos_existentes_update[j]);
-            }
-        }
-
-}
-
-async function seleciona_tipo_conexao(tipo_conexao){
-    $("#report-type").val(tipo_conexao);
-    if(tipo_conexao=='SQL'){
-        $("#exibe_url_s3").hide();
-        $("#exibe_campo_consulta").show();
-        $("#exibe_conexao_banco").show();
-        $("#exibe_fonte_existente").hide();
-        $("#exibe_joins_existentes").hide();
-        $("#exibe_campos_joins").hide();
-    } else if(tipo_conexao=='S3') {
-        $("#exibe_url_s3").show();
-        $("#exibe_campo_consulta").hide();
-        $("#exibe_conexao_banco").hide();
-        $("#exibe_fonte_existente").hide();
-        $("#exibe_joins_existentes").hide();
-        $("#exibe_campos_joins").hide();
-    } else {
-        $("#exibe_url_s3").hide();
-        $("#exibe_campo_consulta").show();
-        $("#exibe_conexao_banco").hide();
-
-        opcoes_fonte_existentes = '<div class="mb-3">'+
-                  '<label class="form-label">Fonte</label>'+
-                  '<select id="fonte_existente" class="form-select">';
-        
-        for(i=0;i<dados.length;i++){
-            opcoes_fonte_existentes=opcoes_fonte_existentes+'<option value="'+dados[i].nome_tabela+'" selected>'+dados[i].nome_tabela+'</option>'
-        }
-
-        opcoes_fonte_existentes=opcoes_fonte_existentes+'</select>'+
-                '</div>';
-
-        $("#exibe_fonte_existente").html(opcoes_fonte_existentes);
-        $("#exibe_fonte_existente").show();
-        $("#exibe_joins_existentes").show();
-        $("#exibe_campos_joins").show();
-    }
-}
-
-async function seleciona_tipo_conexao_update(tipo_conexao){
-    $("#report-type-update").val(tipo_conexao);
-    if(tipo_conexao=='SQL'){
-        $("#exibe_url_s3_update").hide();
-        $("#exibe_campo_consulta_update").show();
-        $("#exibe_conexao_banco_update").show();
-        $("#exibe_fonte_existente_update").hide();
-        $("#exibe_joins_existentes_update").hide();
-        $("#exibe_campos_joins_update").hide();
-    } else if(tipo_conexao=='S3') {
-        $("#exibe_url_s3_update").show();
-        $("#exibe_campo_consulta_update").hide();
-        $("#exibe_conexao_banco_update").hide();
-        $("#exibe_fonte_existente_update").hide();
-        $("#exibe_joins_existentes_update").hide();
-        $("#exibe_campos_joins_update").hide();
-    } else {
-        $("#exibe_url_s3_update").hide();
-        $("#exibe_campo_consulta_update").show();
-        $("#exibe_conexao_banco_update").hide();
-
-        opcoes_fonte_existentes = '<div class="mb-3">'+
-                  '<label class="form-label">Fonte</label>'+
-                  '<select id="fonte_existente_update" class="form-select">';
-        
-        for(i=0;i<dados.length;i++){
-            opcoes_fonte_existentes=opcoes_fonte_existentes+'<option value="'+dados[i].nome_tabela+'" selected>'+dados[i].nome_tabela+'</option>'
-        }
-
-        opcoes_fonte_existentes=opcoes_fonte_existentes+'</select>'+
-                '</div>';
-
-        $("#exibe_fonte_existente_update").html(opcoes_fonte_existentes);
-        $("#exibe_fonte_existente_update").show();
-        $("#exibe_joins_existentes_update").show();
-        $("#exibe_campos_joins_update").show();
-    }
-}
-
-$("#salvar_informações").click(async function(){
-
-    var url = 'https://prod-80.westus.logic.azure.com:443/workflows/50c9684c2d87410ba22caf36056f0a7b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=WkxtGTa_SPCdDiMKgFAfgzrVU389frbpbTbEtQEwECw';
-
-    var verifica_consulta_s3='';
-    var verifica_banco_s3='';
-    var verifica_joins='';
-    var verifica_campo_join_1='';
-    var verifica_campo_join_2='';
-    var verifica_campo_join_3='';
-    var id_linha_criado=0;
-
-    if($("#report-type").val()=='SQL'){
-        verifica_consulta_s3=$("#consulta_sql").val();
-        verifica_banco_s3=$("#conexao_banco").val();
-    } else if($("#report-type").val()=='S3') {
-        verifica_consulta_s3=$("#url_s3").val();
-        verifica_banco_s3='algar-data-science-team-dev';
-    } else {
-        verifica_consulta_s3=$("#consulta_sql").val();
-        verifica_banco_s3=$("#fonte_existente").val();
-        for(i=0 ; i<$("#exibe_joins_existentes").find("input").length; i++){
-            if($("#exibe_joins_existentes").find("input")[i].checked){
-                verifica_joins=$("#exibe_joins_existentes").find("input")[i].value;
-            }
-        }
-        if($("#exibe_campos_joins").find("select").length==1){
-            verifica_campo_join_1=$("#campo_join_1").val();
-        } else if($("#exibe_campos_joins").find("select").length==2){
-            verifica_campo_join_1=$("#campo_join_1").val();
-            verifica_campo_join_2=$("#campo_join_2").val();
-        } else if($("#exibe_campos_joins").find("select").length==3){
-            verifica_campo_join_1=$("#campo_join_1").val();
-            verifica_campo_join_2=$("#campo_join_2").val();
-            verifica_campo_join_3=$("#campo_join_3").val();
+async function carrega_saldo(){
+    for(i=0; i<analycoins_principal.length; i++){
+        if(analycoins_principal[i].userId==userId){
+            saldo_usuario=analycoins_principal[i].analycoins_presente;
         }
     }
 
-    for(i=0 ; i<dados.length; i++){
-        id_linha_criado=i+1;
+    var top_5 = analycoins_principal;
+
+    top_5.sort((a, b) => parseInt(b.analycoins_recebidos) - parseInt(a.analycoins_recebidos));
+
+    top_5 = top_5.slice(0,5);
+
+    for(i=0; i<top_5.length; i++){
+
+        var nome_associado = '';        
+        nome_associado= top_5[i].associado.split(' ')[0]+' '+top_5[i].associado.split(' ')[top_5[i].associado.split(' ').length-1];
+
+        $("#top_5").append('<div class="col-sm-6 col-lg-3">'+
+                    '<div class="card card-sm">'+
+                      '<div class="card-body">'+
+                        '<div class="row align-items-center">'+
+                          '<div class="col-auto">'+
+                            '<span class="avatar" style="background-image: url(./static/avatars/8_orgid_'+top_5[i].userId+'.jfif)">'+
+                            '</span>'+
+                          '</div>'+
+                          '<div class="col">'+
+                            '<div class="font-weight-medium">'+
+                              '<span class="badge bg-green badge-notification badge-pill">'+(i+1)+'º</span><span style="font-size: 11px;"> '+nome_associado+
+                            '</span></div>'+
+                            '<div class="text-muted">'+
+                              '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-coin"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1" /><path d="M12 7v10" /></svg> <span style="font-weight: bolder;">'+top_5[i].analycoins_recebidos+'</span>'+
+                            '</div>'+
+                          '</div>'+
+                        '</div>'+
+                      '</div>'+
+                    '</div>'+
+                  '</div>');
     }
 
-    id_linha_criado++;
-
-    // Compressão da consulta usando pako
-    var compressedQuery = pako.deflate(verifica_consulta_s3);
-
-    // Codificação em base64
-    var encodedQuery = buffer.Buffer.from(compressedQuery).toString('base64');
-
-    var insert_data = {
-        solicitacao: "insercao_linha_tabela",
-        tabela: "ponderacao_cargas",
-        id_linha: ""+id_linha_criado+"",
-        nome_tabela : $("#nome_tabela").val(),
-        consulta_url : encodedQuery,
-        tipo_fonte : $("#report-type").val(),
-        bucket_banco : verifica_banco_s3,
-        qtd_joins: verifica_joins,
-        tabela_join_1: verifica_campo_join_1,
-        tabela_join_2: verifica_campo_join_2,
-        tabela_join_3: verifica_campo_join_3,
-        descricao_negocio : $("#descricao_info").val(),
-        status : "1",
-        usuario : email,
-        x_api_key: "1348f1ed93616d59f6d62eb7631ae137cc902fc9cc4bb22428a384c1cec91c20"
-    };
-
-    await fetch(url,{
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(insert_data)
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('cadastro realizado com sucesso');
-        })
-        .catch(error => {
-            console.log('problema na conexão com a api');
-        })
-
-    await $("#dados_cargas").html('');
-    await carrega_cargas(email);
-
-});
-
-
-async function exclui_carga(id_linha){
-
-    var url = 'https://prod-22.westus.logic.azure.com:443/workflows/3643c1c102744a728fa718ff38140b50/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=SP051J8clZbz17k2qKJaMQFqu7eKw7uQFK-jzh8rrwc';
-
-    var insert_data = {
-        solicitacao: "deleta_linha_tabela",
-        tabela: "ponderacao_cargas",
-        key: ""+id_linha+"",
-        email : email,
-        x_api_key: "1348f1ed93616d59f6d62eb7631ae137cc902fc9cc4bb22428a384c1cec91c20"
-    };
-    
-    await fetch(url,{
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(insert_data)
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('exclusão realizada com sucesso');
-        })
-        .catch(error => {
-            console.log('problema na conexão com a api');
-        })
-
-    await sleep(2000);
-    await $("#dados_cargas").html('');
-    await carrega_cargas(email);
-
+    await $("#saldo_usuario").text(saldo_usuario);
 }
-
-
-async function atualiza_consulta(id_linha,descricao_negocio,consulta_url){
-
-    var url = 'https://prod-125.westus.logic.azure.com:443/workflows/ec113c1849d34343b643b86b9725dddc/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=wfR6aFT1EvuRvXnPmsrt_PKVd3hmpaA3iP1VYeLHz5k';
-
-    var insert_data = {
-        solicitacao: "atualiza_consulta_tabela",
-        tabela: "ponderacao_cargas",
-        key: ""+id_linha+"",
-        descricao: ""+descricao_negocio+"",
-        consulta: ""+consulta_url+"",
-        email : email,
-        x_api_key: "1348f1ed93616d59f6d62eb7631ae137cc902fc9cc4bb22428a384c1cec91c20"
-    };
-    
-    await fetch(url,{
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(insert_data)
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('atualização realizada com sucesso');
-        })
-        .catch(error => {
-            console.log('problema na conexão com a api');
-        })
-
-    await sleep(2000);
-    await $("#dados_cargas").html('');
-    await carrega_cargas(email);
-
-}
-
-async function confirma_excluir_carga(id_linha){
-    $("#confirma_exclusao").attr('onClick','exclui_carga('+id_linha+')');    
-}
-
-
-async function carrega_informacoes_update(id_linha){
-    for(i=0; i<dados.length; i++){
-        if(dados[i].id==id_linha){
-            // Decodificação de base64
-            var decodedQuery = buffer.Buffer.from(dados[i].consulta_url, 'base64');
-            // Descompressão da consulta
-            var calculo = pako.inflate(decodedQuery, { to: 'string' });
-            $("#consulta_sql_update").val(calculo);
-            $("#descricao_info_update").val(dados[i].descricao_negocio);
-            $("#linha_key_upadate").val(id_linha);        
-        }
-    }
-}
-
-$("#atualizar_informacoes").click(async function(){
-
-    // Compressão da consulta usando pako
-    var compressedQuery = pako.deflate($("#consulta_sql_update").val());
-
-    // Codificação em base64
-    var encodedQuery = buffer.Buffer.from(compressedQuery).toString('base64');
-
-    await atualiza_consulta($("#linha_key_upadate").val(),$("#descricao_info_update").val(),encodedQuery);
-
-    await sleep(2000);
-    await $("#dados_cargas").html('');
-    await carrega_cargas(email);
-
-});
