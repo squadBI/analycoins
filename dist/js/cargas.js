@@ -250,4 +250,76 @@ $("#salvar_reconhecimento_1").click(async function(){
 
 $("#salvar_reconhecimento_2").click(async function(){
   
+    $("#page_loader").show();
+    $("#pagina_principal").hide();
+
+    hash_gerada_randomicamente_1 = generateRandomHash(32); // Gera uma hash de 32 caracteres
+    hash_gerada_randomicamente_2 = generateRandomHash(32); // Gera uma hash de 32 caracteres
+
+    var comportamento = '';
+
+    for(i=0; i<$("input[name='comportamento_1']").length; i++){
+        if($("input[name='comportamento_1']")[i].checked){
+            comportamento = $("input[name='comportamento_1']")[i].value;
+        }
+    }
+
+   var url = 'https://prod-175.westus.logic.azure.com:443/workflows/5d462d9735984dcb90286653ea7f3b56/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hF4G6uAq2KSYnb24Plug1jn-kOQqH6Jr-urJhPcvYZo';
+
+    var login_data = {
+    "id_transacao": hash_gerada_randomicamente_1,
+    "userId_presente": userId,
+    "analycoins": 5,
+    "userId_recebeu": $("#associados_aptos_1").val(), 
+    "comportamento": comportamento,
+    "msg_reconhecimento": $("#reconhecimento_1").val() 
+};
+
+    await sleep(15000);
+
+    await fetch(url,{
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(login_data)
+    })
+        .then(response => response.json())
+        .then(data => {
+        })
+        .catch(error => {
+            console.log('problema na conexão com a api');
+        })
+
+    for(i=0; i<$("input[name='comportamento_2']").length; i++){
+        if($("input[name='comportamento_2']")[i].checked){
+            comportamento = $("input[name='comportamento_2']")[i].value;
+        }
+    }
+var login_data = {
+    "id_transacao": hash_gerada_randomicamente_2,
+    "userId_presente": userId,
+    "analycoins": 5,
+    "userId_recebeu": $("#associados_aptos_2").val(), 
+    "comportamento": comportamento,
+    "msg_reconhecimento": $("#reconhecimento_2").val() 
+};
+
+    await fetch(url,{
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(login_data)
+    })
+        .then(response => response.json())
+        .then(data => {
+        })
+        .catch(error => {
+            console.log('problema na conexão com a api');
+        })
+
+    await sleep(15000);
+    window.location.reload(); 
+
 });
