@@ -6,7 +6,6 @@
             usuario = localStorage.getItem('usuario');
 
             await $("#usuario").text(usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1]);
-            await $("#posicao").text('POSICAO');
 
             await $("#avatar").css('background-image','url(./static/avatars/8_orgid_'+userId+'.jfif)');
 

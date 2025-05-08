@@ -33,6 +33,7 @@ function tranforma_data_iso(dataHora) {
     userId = localStorage.getItem('userId');
     email = localStorage.getItem('email');
     usuario = localStorage.getItem('usuario');
+    funcao = '';
 
     usuario_nome_compacto = usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1];
 
@@ -152,8 +153,11 @@ async function carrega_saldo(){
     for(i=0; i<analycoins_principal.length; i++){
         if(analycoins_principal[i].userId==userId){
             saldo_usuario=analycoins_principal[i].analycoins_presente;
+            funcao=analycoins_principal[i].funcao;
         }
     }
+
+    await $("#posicao").text(funcao);
 
     var top_5 = analycoins_principal;
 
