@@ -66,7 +66,21 @@
   </head>
   <body >
     <script src="./dist/js/demo-theme.min.js?1684106062"></script>
-    <div class="page">
+    <div id="page_loader" class="page page-center" style="display: none;">
+      <div class="container container-slim py-4">
+        <div class="text-center">
+          <div class="mb-3">
+            <a href="#" class="navbar-brand navbar-brand-autodark"><img src="./coin.png" height="36" alt=""></a>
+          </div>
+          <div class="text-muted mb-3">Salvando reconhecimento</div>
+          <div class="progress progress-sm">
+            <div class="progress-bar progress-bar-indeterminate"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pagina_principal" class="page">
       <!-- Navbar -->
       <header class="navbar navbar-expand-md d-print-none" >
         <div class="container-xl">
@@ -257,7 +271,7 @@
             <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
               Cancelar
             </a>
-            <a href="#" class="btn btn-success ms-auto" data-bs-dismiss="modal">
+            <a id="salvar_reconhecimento_1" class="btn btn-success ms-auto" data-bs-dismiss="modal">
               Salvar reconhecimento
             </a>
           </div>
@@ -269,99 +283,116 @@
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">New report</h5>
+            <h5 class="modal-title">Presentear 2 pessoas com 5 analycoins cada</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Name</label>
-              <input type="text" class="form-control" name="example-text-input" placeholder="Your report name">
+              <div class="mb-3">
+              <label class="form-label">Quem você gostaria de recompensar com 5 AnalyCoins?</label>
+              <select class="form-select" id="associados_aptos_1">
+                  </select>
             </div>
-            <label class="form-label">Report type</label>
-            <div class="form-selectgroup-boxes row mb-3">
-              <div class="col-lg-6">
-                <label class="form-selectgroup-item">
-                  <input type="radio" name="report-type" value="1" class="form-selectgroup-input" checked>
-                  <span class="form-selectgroup-label d-flex align-items-center p-3">
-                    <span class="me-3">
-                      <span class="form-selectgroup-check"></span>
-                    </span>
-                    <span class="form-selectgroup-label-content">
-                      <span class="form-selectgroup-title strong mb-1">Simple</span>
-                      <span class="d-block text-muted">Provide only basic data needed for the report</span>
-                    </span>
-                  </span>
-                </label>
-              </div>
-              <div class="col-lg-6">
-                <label class="form-selectgroup-item">
-                  <input type="radio" name="report-type" value="1" class="form-selectgroup-input">
-                  <span class="form-selectgroup-label d-flex align-items-center p-3">
-                    <span class="me-3">
-                      <span class="form-selectgroup-check"></span>
-                    </span>
-                    <span class="form-selectgroup-label-content">
-                      <span class="form-selectgroup-title strong mb-1">Advanced</span>
-                      <span class="d-block text-muted">Insert charts and additional advanced analyses to be inserted in the report</span>
-                    </span>
-                  </span>
-                </label>
+            <label class="form-label">Selecione o comportamento que evidencia esse reconhecimento</label>
+            <div class="form-selectgroup-boxes row">
+              <div class="col-lg-12">
+                <div class="mb-3">
+                            <div>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_1" value="Capacidade de ouvir e abertura para opiniões">
+                                <span class="form-check-label">Capacidade de ouvir e abertura para opiniões</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_1" value="Agilidade com simplicidade">
+                                <span class="form-check-label">Agilidade com simplicidade</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_1" value="Autonomia com responsabilidade">
+                                <span class="form-check-label">Autonomia com responsabilidade</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_1" value="Analise de riscos e oportunidades">
+                                <span class="form-check-label">Analise de riscos e oportunidades</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_1" value="Efetividade na entrega">
+                                <span class="form-check-label">Efetividade na entrega</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_1" value="Orientação pelo cliente e mercado">
+                                <span class="form-check-label">Orientação pelo cliente e mercado</span>
+                              </label>
+                            </div>
+                          </div>
               </div>
             </div>
             <div class="row">
-              <div class="col-lg-8">
+              <div class="col-lg-12">
                 <div class="mb-3">
-                  <label class="form-label">Report url</label>
+                  <label class="form-label">Descreva o seu reconhecimento</label>
                   <div class="input-group input-group-flat">
-                    <span class="input-group-text">
-                      https://tabler.io/reports/
-                    </span>
-                    <input type="text" class="form-control ps-0"  value="report-01" autocomplete="off">
+                    <textarea id="reconhecimento_1" type="text" class="form-control ps-0"></textarea>
                   </div>
-                </div>
-              </div>
-              <div class="col-lg-4">
-                <div class="mb-3">
-                  <label class="form-label">Visibility</label>
-                  <select class="form-select">
-                    <option value="1" selected>Private</option>
-                    <option value="2">Public</option>
-                    <option value="3">Hidden</option>
-                  </select>
                 </div>
               </div>
             </div>
           </div>
           <div class="modal-body">
             <div class="row">
-              <div class="col-lg-6">
                 <div class="mb-3">
-                  <label class="form-label">Client name</label>
-                  <input type="text" class="form-control">
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <div class="mb-3">
-                  <label class="form-label">Reporting period</label>
-                  <input type="date" class="form-control">
-                </div>
-              </div>
+              <label class="form-label">Quem você gostaria de recompensar com 5 AnalyCoins?</label>
+              <select class="form-select" id="associados_aptos_2">
+                  </select>
+            </div>
+            <label class="form-label">Selecione o comportamento que evidencia esse reconhecimento</label>
+            <div class="form-selectgroup-boxes row">
               <div class="col-lg-12">
-                <div>
-                  <label class="form-label">Additional information</label>
-                  <textarea class="form-control" rows="3"></textarea>
+                <div class="mb-3">
+                            <div>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_2" value="Capacidade de ouvir e abertura para opiniões">
+                                <span class="form-check-label">Capacidade de ouvir e abertura para opiniões</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_2" value="Agilidade com simplicidade">
+                                <span class="form-check-label">Agilidade com simplicidade</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_2" value="Autonomia com responsabilidade">
+                                <span class="form-check-label">Autonomia com responsabilidade</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_2" value="Analise de riscos e oportunidades">
+                                <span class="form-check-label">Analise de riscos e oportunidades</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_2" value="Efetividade na entrega">
+                                <span class="form-check-label">Efetividade na entrega</span>
+                              </label>
+                              <label class="form-check">
+                                <input class="form-check-input" type="radio" name="comportamento_2" value="Orientação pelo cliente e mercado">
+                                <span class="form-check-label">Orientação pelo cliente e mercado</span>
+                              </label>
+                            </div>
+                          </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-12">
+                <div class="mb-3">
+                  <label class="form-label">Descreva o seu reconhecimento</label>
+                  <div class="input-group input-group-flat">
+                    <textarea id="reconhecimento_2" type="text" class="form-control ps-0"></textarea>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div class="modal-footer">
             <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
-              Cancel
+              Cancelar
             </a>
-            <a href="#" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
-              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
-              Create new report
+            <a id="salvar_reconhecimento_2" class="btn btn-success ms-auto" data-bs-dismiss="modal">
+              Salvar reconhecimento
             </a>
           </div>
         </div>
