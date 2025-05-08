@@ -26,6 +26,8 @@ function tranforma_data_iso(dataHora) {
 
 (async function () {
     dados = Array(0);
+    analycoins_principal = Array(0);
+    analycoins_transacoes = Array(0);
 
     userId = localStorage.getItem('userId');
     email = localStorage.getItem('email');
@@ -34,6 +36,9 @@ function tranforma_data_iso(dataHora) {
     usuario_nome_compacto = usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1];
 
     await carrega_associados_aptos();
+    await carrega_info_analycoins();
+    await sleep(1000);
+    await carrega_info_transacoes();
 
 })();
 
@@ -66,72 +71,78 @@ async function carrega_associados_aptos(){
 }
 
 
-async function carrega_info_cargas(id_linha){
+async function carrega_info_analycoins(){
 
-    await $( ".list-group-item" ).removeClass( "active" );
-    await $( "#info_carga_active"+ id_linha ).addClass( "active" );
+    var url = 'https://prod-51.westus.logic.azure.com:443/workflows/cc9ef43aa7dc477086c36307192d7a22/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cj2f9HCKF-w3YLTOhsHbJaqfw3JYf9ukzR_yFBpV8OQ';
 
-    for(i=0; i<dados.length; i++){
-        if(dados[i].id==id_linha){
-            // Decodificação de base64
-            var decodedQuery = buffer.Buffer.from(dados[i].consulta_url, 'base64');
-            // Descompressão da consulta
-            var calculo = pako.inflate(decodedQuery, { to: 'string' });
-            $("#info_cargas").html('');
-            $("#info_cargas").append('<div class="datagrid mb-3">'+
-                  '<div class="datagrid-item">'+
-                    '<div class="datagrid-title">Qtd. linhas</div>'+
-                    '<div class="datagrid-content">'+dados[i].num_linhas+'</div>'+
-                  '</div>'+
-                  '<div class="datagrid-item">'+
-                    '<div class="datagrid-title">Qtd. Colunas</div>'+
-                    '<div class="datagrid-content">'+dados[i].num_colunas+'</div>'+
-                  '</div>'+
-                  '<div class="datagrid-item">'+
-                    '<div class="datagrid-title">Data Criação</div>'+
-                    '<div class="datagrid-content">'+dados[i].data_registro+'</div>'+
-                  '</div>'+
-                  '<div class="datagrid-item">'+
-                    '<div class="datagrid-title">Data Execução</div>'+
-                    '<div class="datagrid-content">'+dados[i].data_execucao+'</div>'+
-                  '</div>'+
-                  '<div class="datagrid-item">'+
-                    '<div class="datagrid-title">Usuário</div>'+
-                    '<div class="datagrid-content">'+
-                      '<div class="d-flex align-items-center">'+
-                        dados[i].usuario+
+    var login_data = {
+        
+    };
+
+    fetch(url,{
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(login_data)
+    })
+        .then(response => response.json())
+        .then(data => {
+            analycoins_principal = JSON.parse(data.resultado);
+            console.log(analycoins_principal);
+        })
+        .catch(error => {
+            console.log('problema na conexão com a api');
+        })
+
+}
+
+
+async function carrega_info_transacoes(principal){
+
+    var url = 'https://prod-161.westus.logic.azure.com:443/workflows/4504ac120c7948e2b6c21667b2057ed3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=WYWD7cyILHEEe50QpvzqyW2JX6y3PBkiJiBu0utgJZI';
+
+    var login_data = {
+        
+    };
+
+    fetch(url,{
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(login_data)
+    })
+        .then(response => response.json())
+        .then(data => {
+            analycoins_transacoes = JSON.parse(data.resultado);
+            for(i=0; i<analycoins_transacoes.length; i++){
+
+                var nome_recebeu='';
+                for(j=0; j<analycoins_principal.length; j++){
+                    if(analycoins_principal[j].userId==analycoins_transacoes[i].userId_recebeu){
+                        nome_recebeu=analycoins_principal[j].associado.split(' ')[0]+' '+analycoins_principal[j].associado.split(' ')[1]+' '+analycoins_principal[j].associado.split(' ')[analycoins_principal[j].associado.split(' ').length-1];
+                    }
+                }
+
+                $("#transacoes").append('<li class="timeline-event">'+
+                    '<div class="timeline-event-icon bg-twitter-lt"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->'+
+                      '<span class="avatar" style="background-image: url(./static/avatars/8_orgid_'+analycoins_transacoes[i].userId_presente+'.jfif)">'+
+                            '<span class="badge bg-success"></span></span>'+
+                    '</div>'+
+                    '<div class="card timeline-event-card">'+
+                      '<div class="card-body">'+
+                        '<div class="text-muted float-end">'+analycoins_transacoes[i].dt_transacao+'</div>'+
+                        '<h4>+'+analycoins_transacoes[i].analycoins+' Analycoins para '+nome_recebeu+'</h4>'+
+                        '<p class="text-muted">'+analycoins_transacoes[i].msg_reconhecimento+'</p>'+
                       '</div>'+
                     '</div>'+
-                  '</div>'+
-                  '<div class="datagrid-item">'+
-                    '<div class="datagrid-title">Descrição</div>'+
-                    '<div class="datagrid-content">'+
-                      dados[i].descricao_negocio+
-                    '</div>'+
-                  '</div>'+
-                '</div>');
-
-            $("#botoes_acao_tabela").html('');
-            $("#botoes_acao_tabela").html('<a onClick="inicia_varredura_execucao()" class="btn-action" style="cursor: pointer;">'+
-                          '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-player-play"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 4v16l13 -8z" /></svg>'+
-                        '</a>'+
-                        '<a data-bs-toggle="modal" data-bs-target="#modal-update" onClick="carrega_informacoes_update('+dados[i].id+')" class="btn-action" style="cursor: pointer;">'+
-                          '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-edit"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>'+
-                        '</a>'+
-                        '<a data-bs-toggle="modal" data-bs-target="#modal-confirma-delete" onClick="confirma_excluir_carga('+dados[i].id+')" class="btn-action" style="cursor: pointer;">'+
-                          '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-database-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6c0 1.657 3.582 3 8 3s8 -1.343 8 -3s-3.582 -3 -8 -3s-8 1.343 -8 3" /><path d="M4 6v6c0 1.657 3.582 3 8 3c.537 0 1.062 -.02 1.57 -.058" /><path d="M20 13.5v-7.5" /><path d="M4 12v6c0 1.657 3.582 3 8 3c.384 0 .762 -.01 1.132 -.03" /><path d="M22 22l-5 -5" /><path d="M17 22l5 -5" /></svg>'+
-                        '</a>');
-
-        }
-    }
-
-    await $("#editor").html('');
-          const editor = CodeMirror(document.getElementById("editor"), {
-      mode: "sql",
-      theme: "dracula",
-      lineNumbers: false,
-      value: calculo
-    });
+                  '</li>');
+            }
+        })
+        .catch(error => {
+            console.log('problema na conexão com a api');
+        })
 
 }
 
