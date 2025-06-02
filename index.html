@@ -28,6 +28,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.3/mode/sql/sql.min.js"></script>
     <script src="https://bundle.run/buffer@6.0.3"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
+    <!-- Toastr style -->
+    <link href="./dist/css/toastr.min.css" rel="stylesheet">
+    
     <style>
       @import url('https://rsms.me/inter/inter.css');
       :root {
@@ -104,7 +107,7 @@
                     <div class="card-header">
                       <h3 class="card-title">Formas de presentear</h3>
                     </div>
-                    <div class="list-group list-group-flush list-group-hoverable">
+                    <div class="list-group list-group-flush list-group-hoverable" id="mostra_acoes">
                       <div class="list-group-item">
                         <div class="row align-items-center">
                           <div class="col-auto"><span class="status-dot status-dot-animated bg-green d-block"></span></div>
@@ -229,7 +232,7 @@
                 <div class="mb-3">
                             <div>
                               <label class="form-check">
-                                <input class="form-check-input" type="radio" name="comportamento" value="Capacidade de ouvir e abertura para opiniões">
+                                <input class="form-check-input" type="radio" name="comportamento" value="Capacidade de ouvir e abertura para opiniões" checked>
                                 <span class="form-check-label">Capacidade de ouvir e abertura para opiniões</span>
                               </label>
                               <label class="form-check">
@@ -298,7 +301,7 @@
                 <div class="mb-3">
                             <div>
                               <label class="form-check">
-                                <input class="form-check-input" type="radio" name="comportamento_1" value="Capacidade de ouvir e abertura para opiniões">
+                                <input class="form-check-input" type="radio" name="comportamento_1" value="Capacidade de ouvir e abertura para opiniões" checked>
                                 <span class="form-check-label">Capacidade de ouvir e abertura para opiniões</span>
                               </label>
                               <label class="form-check">
@@ -349,7 +352,7 @@
                 <div class="mb-3">
                             <div>
                               <label class="form-check">
-                                <input class="form-check-input" type="radio" name="comportamento_2" value="Capacidade de ouvir e abertura para opiniões">
+                                <input class="form-check-input" type="radio" name="comportamento_2" value="Capacidade de ouvir e abertura para opiniões" checked>
                                 <span class="form-check-label">Capacidade de ouvir e abertura para opiniões</span>
                               </label>
                               <label class="form-check">
@@ -424,6 +427,7 @@
     <script src="./dist/libs/jsvectormap/dist/js/jsvectormap.min.js?1684106062" defer></script>
     <script src="./dist/libs/jsvectormap/dist/maps/world.js?1684106062" defer></script>
     <script src="./dist/libs/jsvectormap/dist/maps/world-merc.js?1684106062" defer></script>
+    <script src="./dist/js/toastr.min.js" defer></script>
     <!-- Tabler Core -->
     <script src="./dist/js/tabler.min.js?1684106062" defer></script>
     <script src="./dist/js/demo.min.js?1684106062" defer></script>
