@@ -43,7 +43,7 @@ function tranforma_data_iso(dataHora) {
 
     usuario_nome_compacto = usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1];
 
-    await carrega_associados_aptos();
+    await carrega_associados_aptos(userId);
     await carrega_info_analycoins();
     await sleep(3000);
     await carrega_info_transacoes();
@@ -52,7 +52,7 @@ function tranforma_data_iso(dataHora) {
 
 })();
 
-async function carrega_associados_aptos(){
+async function carrega_associados_aptos(usuario_atual){
     
     var url = 'https://prod-13.westus.logic.azure.com:443/workflows/33f2b697599f43bbb2feb880995d6afa/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_yc3eSZUh6sEGxZoKMQeNahrfG3SWjkOq_gWroyaE-M';
 
@@ -71,10 +71,19 @@ async function carrega_associados_aptos(){
         .then(data => {
             dados = JSON.parse(data.result);
             dados = dados.value;
-            for(i=0; i<dados.length; i++){
-                $("#associados_aptos").append('<option value="'+dados[i].userId+'">'+dados[i].displayName.toUpperCase()+'</option>');
-                $("#associados_aptos_1").append('<option value="'+dados[i].userId+'">'+dados[i].displayName.toUpperCase()+'</option>');
-                $("#associados_aptos_2").append('<option value="'+dados[i].userId+'">'+dados[i].displayName.toUpperCase()+'</option>');
+            for(i=0; i<dados.length; i++){                
+                const userIdsParaExcluir = [
+                    '226dfd02-c26f-4a64-ad88-7938ea56a194',
+                    'c8aca117-a758-4150-b1da-32fa4d990966',
+                    'a97d4906-7bed-41a1-81d8-7152ca54c926',
+                    usuario_atual
+                ];
+
+                const dadosFiltrados = dados.filter(item => !userIdsParaExcluir.includes(item.userId));
+
+                $("#associados_aptos").append('<option value="'+dadosFiltrados[i].userId+'">'+dadosFiltrados[i].displayName.toUpperCase()+'</option>');
+                $("#associados_aptos_1").append('<option value="'+dadosFiltrados[i].userId+'">'+dadosFiltrados[i].displayName.toUpperCase()+'</option>');
+                $("#associados_aptos_2").append('<option value="'+dadosFiltrados[i].userId+'">'+dadosFiltrados[i].displayName.toUpperCase()+'</option>');
             }
         })
         .catch(error => {
@@ -165,6 +174,10 @@ async function carrega_saldo(){
         }
     }
 
+    if(saldo_usuario==0){
+        $("#mostra_acoes").hide();
+    }
+
     await $("#posicao").text(funcao);
 
     var top_5 = analycoins_principal;
@@ -205,7 +218,17 @@ async function carrega_saldo(){
 
 $("#salvar_reconhecimento_1").click(async function(){
 
-    hash_gerada_randomicamente = generateRandomHash(32); // Gera uma hash de 32 caracteres
+    if($("#reconhecimento").val()==' ' || $("#reconhecimento").val()=='' || $("#reconhecimento").val()==undefined){
+        toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    showMethod: 'slideDown',
+                    timeOut: 4000
+                };
+                toastr.warning('Campos Obrigatórios', 'Todo campo deve ser preenchido')
+    } else {
+
+        hash_gerada_randomicamente = generateRandomHash(32); // Gera uma hash de 32 caracteres
 
     var comportamento = '';
 
@@ -244,13 +267,25 @@ $("#salvar_reconhecimento_1").click(async function(){
     $("#pagina_principal").hide();
 
     await sleep(15000);
-    window.location.reload(); 
+    window.location.reload();
+
+    } 
   
 });
 
 $("#salvar_reconhecimento_2").click(async function(){
-  
-    $("#page_loader").show();
+
+    if($("#reconhecimento_1").val()==' ' || $("#reconhecimento_1").val()=='' || $("#reconhecimento_1").val()==undefined || $("#reconhecimento_2").val()==' ' || $("#reconhecimento_2").val()=='' || $("#reconhecimento_2").val()==undefined){
+        toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    showMethod: 'slideDown',
+                    timeOut: 4000
+                };
+                toastr.warning('Campos Obrigatórios', 'Todo campo deve ser preenchido')
+    } else {
+
+        $("#page_loader").show();
     $("#pagina_principal").hide();
 
     hash_gerada_randomicamente_1 = generateRandomHash(32); // Gera uma hash de 32 caracteres
@@ -320,6 +355,9 @@ var login_data = {
         })
 
     await sleep(15000);
-    window.location.reload(); 
+    window.location.reload();
+
+    }
+   
 
 });
