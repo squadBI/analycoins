@@ -43,6 +43,7 @@ function tranforma_data_iso(dataHora) {
 
     usuario_nome_compacto = usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1];
 
+    await sleep(2000);
     await carrega_associados_aptos(userId);
     await carrega_info_analycoins();
     await sleep(3000);
