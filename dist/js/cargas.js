@@ -43,13 +43,14 @@ function tranforma_data_iso(dataHora) {
 
     usuario_nome_compacto = usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1];
 
-    await sleep(2000);
-    await carrega_associados_aptos(userId);
     await carrega_info_analycoins();
     await sleep(3000);
     await carrega_info_transacoes();
     await sleep(3000);
     await carrega_saldo();
+    await sleep(2000);
+    await carrega_associados_aptos(userId);
+    //await envia_msg_analy();
 
 })();
 
@@ -90,6 +91,71 @@ async function carrega_associados_aptos(usuario_atual){
         .catch(error => {
             console.log('problema na conexão com a api');
         })
+}
+
+async function envia_msg_analy(){
+
+    var url = 'https://prod-13.westus.logic.azure.com:443/workflows/33f2b697599f43bbb2feb880995d6afa/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_yc3eSZUh6sEGxZoKMQeNahrfG3SWjkOq_gWroyaE-M';
+
+    var login_data = {
+        
+    };
+
+    await fetch(url,{
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(login_data)
+    })
+        .then(response => response.json())
+        .then(data => {
+            dados = JSON.parse(data.result);
+            dados = dados.value;
+
+            (async function () {
+  async function* asyncGenerator() {
+              var i = 0;
+              while (i < dados.length) {
+                yield i++;
+              }
+            }
+
+            for await (let num of asyncGenerator()) {             
+               var url_usuario = 'https://prod-63.westus.logic.azure.com:443/workflows/72e8e6f5a86d4c8cb84237ea7232f775/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=1nXAStE-mJQjNarj7ceeMFu4sM8RH4y6dJbhdZ2PrDo';
+
+                    var login_data_usario = {
+                    "adaptativeBody": "{'type': 'AdaptiveCard', 'body': [{'type': 'TextBlock', 'size': 'Medium', 'text': '🎉 **Hora de Reconhecer!** 🎉' }, {'type': 'TextBlock', 'text': 'Olá, querido time de **Analytics**! 👋', 'wrap': true, 'horizontalAlignment': 'Left' }, {'type': 'TextBlock', 'text': 'Chegou aquele momento especial do mês em que celebramos nossa **cultura de reconhecimento!**', 'wrap': true, 'spacing': 'None' }, {'type': 'TextBlock', 'text': 'É hora de valorizar quem está mandando muito bem e fazer aquele reconhecimento que aquece o coração! 💫', 'wrap': true, 'spacing': 'None' }, {'type': 'TextBlock', 'text': 'Você acaba de receber **10 Analycoins** para reconhecer seus colegas incríveis, e eles devem ser utilizados até **30/06**! ⏳', 'wrap': true }, {'type': 'TextBlock', 'text': '✨ **Como funciona? Relembre as regrinhas mágicas:**', 'wrap': true }, {'type': 'TextBlock', 'text': '✅ Reconheça **1 ou 2 pessoas:**', 'wrap': true, 'spacing': 'None' }, {'type': 'TextBlock', 'text': '- Pode usar **10 Analycoins para uma pessoa só**', 'wrap': true }, {'type': 'TextBlock', 'text': '- Ou **5 Analycoins para cada**, se quiser reconhecer duas!', 'wrap': true, 'spacing': 'None' }, {'type': 'TextBlock', 'text': '✅ **Escolha o comportamento** que mais representa a atitude do colega.', 'wrap': true }, {'type': 'TextBlock', 'text': '✅ **Descreva seu reconhecimento com carinho:**', 'wrap': true, 'spacing': 'None' }, {'type': 'TextBlock', 'text': 'Abra seu coração ❤️ — seu colega vai adorar saber que o trabalho dele está fazendo a diferença!', 'wrap': true, 'spacing': 'None' }, {'type': 'TextBlock', 'text': '⚠️ **Importante:**', 'wrap': true }, {'type': 'TextBlock', 'text': '- Os **10 Analycoins para reconhecimento não são acumulativos**, então use-os até o fim do mês!', 'wrap': true }, {'type': 'TextBlock', 'text': '- Já os **Analycoins recebidos** são acumulativos e, ao atingir **150**, podem ser trocados por um **day off**! (Lembre-se de alinhar com o PO e avisar a Amanda 😉)', 'wrap': true, 'spacing': 'None' }, {'type': 'TextBlock', 'text': 'Vamos juntos espalhar reconhecimento e fortalecer ainda mais nosso time! 🚀', 'wrap': true }, {'type': 'TextBlock', 'text': 'Em caso de dúvidas, fale com a **Amanda** ou o **Paulo**.', 'wrap': true }, {'type': 'TextBlock', 'text': '**Aproveitem e bora reconhecer!** 🙌', 'wrap': true, 'spacing': 'None' }, {'type': 'ActionSet', 'actions': [{'type': 'Action.OpenUrl', 'title': 'Acessar Analycoins', 'url': 'https://squadbi.github.io/analycoins/' } ] } ], '$schema': 'http://adaptivecards.io/schemas/adaptive-card.json', 'version': '1.5' }",
+                    "sendMail": dados[num].email,
+                    "group": "teste",
+                    "priority": "teste",
+                    "userSender": "gustavoha@algartelecom.com.br"
+                };
+
+                sleep(1200);
+
+                fetch(url_usuario,{
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(login_data_usario)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Enviado para ' + dados[num].email)
+                })
+                .catch(error => {
+                    console.log('Erro ao enviar para ' + dados[num].email);
+                })
+
+            }
+})();
+        })
+        .catch(error => {
+            console.log('problema na conexão com a api');
+        })
+
 }
 
 
