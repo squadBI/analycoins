@@ -32,6 +32,7 @@ function tranforma_data_iso(dataHora) {
 
 (async function () {
     dados = Array(0);
+    dadosFiltrados = Array(0);
     analycoins_principal = Array(0);
     analycoins_transacoes = Array(0);
     saldo_usuario=0;
@@ -43,13 +44,45 @@ function tranforma_data_iso(dataHora) {
 
     usuario_nome_compacto = usuario.split(' ')[0]+' '+usuario.split(' ')[usuario.split(' ').length-1];
 
+    var url = 'https://prod-13.westus.logic.azure.com:443/workflows/33f2b697599f43bbb2feb880995d6afa/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_yc3eSZUh6sEGxZoKMQeNahrfG3SWjkOq_gWroyaE-M';
+
+    var login_data = {
+        
+    };
+
+    await fetch(url,{
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(login_data)
+    })
+        .then(response => response.json())
+        .then(data => {
+            dados = JSON.parse(data.result);
+            dados = dados.value;
+            var userIdsParaExcluir = [
+                    '226dfd02-c26f-4a64-ad88-7938ea56a194',
+                    'c8aca117-a758-4150-b1da-32fa4d990966',
+                    'a97d4906-7bed-41a1-81d8-7152ca54c926',
+                    '80afcec6-b1b9-43d8-a4a5-2f9a32d5f27e',
+                    userId
+                ];
+            dadosFiltrados = dados.filter(item => !userIdsParaExcluir.includes(item.userId));
+            console.log(dadosFiltrados);
+
+        })
+        .catch(error => {
+            console.log('problema na conexão com a api');
+        })
+
     await carrega_info_analycoins();
     await sleep(3000);
     await carrega_info_transacoes();
     await sleep(3000);
     await carrega_saldo();
-    await sleep(3000);
-    await carrega_associados_aptos(userId);
+    await sleep(6000);
+    await carrega_listas_associados(dadosFiltrados);
     //await envia_msg_analy();
 
 })();
@@ -67,40 +100,6 @@ async function carrega_listas_associados(lista){
                 $("#associados_aptos_1").append('<option value="'+lista[i].userId+'">'+lista[i].displayName.toUpperCase()+'</option>');
                 $("#associados_aptos_2").append('<option value="'+lista[i].userId+'">'+lista[i].displayName.toUpperCase()+'</option>');
             }
-}
-
-async function carrega_associados_aptos(usuario_atual){
-    
-    var url = 'https://prod-13.westus.logic.azure.com:443/workflows/33f2b697599f43bbb2feb880995d6afa/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_yc3eSZUh6sEGxZoKMQeNahrfG3SWjkOq_gWroyaE-M';
-
-    var login_data = {
-        
-    };
-
-    fetch(url,{
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(login_data)
-    })
-        .then(response => response.json())
-        .then(data => {
-            dados = JSON.parse(data.result);
-            dados = dados.value;
-            var userIdsParaExcluir = [
-                    '226dfd02-c26f-4a64-ad88-7938ea56a194',
-                    'c8aca117-a758-4150-b1da-32fa4d990966',
-                    'a97d4906-7bed-41a1-81d8-7152ca54c926',
-                    usuario_atual
-                ];
-            var dadosFiltrados = dados.filter(item => !userIdsParaExcluir.includes(item.userId));
-
-            carrega_listas_associados(dadosFiltrados);
-        })
-        .catch(error => {
-            console.log('problema na conexão com a api');
-        })
 }
 
 async function envia_msg_analy(){
