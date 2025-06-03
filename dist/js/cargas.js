@@ -83,6 +83,8 @@ function tranforma_data_iso(dataHora) {
     await carrega_saldo();
     await sleep(6000);
     await carrega_listas_associados(dadosFiltrados);
+    await $("#page_loader_info").hide();
+    await $("#pagina_principal").show();
     //await envia_msg_analy();
 
 })();
