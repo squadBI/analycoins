@@ -73,15 +73,15 @@ async function carrega_associados_aptos(usuario_atual){
         .then(data => {
             dados = JSON.parse(data.result);
             dados = dados.value;
-            for(i=0; i<dados.length; i++){                
-                const userIdsParaExcluir = [
+            var userIdsParaExcluir = [
                     '226dfd02-c26f-4a64-ad88-7938ea56a194',
                     'c8aca117-a758-4150-b1da-32fa4d990966',
                     'a97d4906-7bed-41a1-81d8-7152ca54c926',
                     usuario_atual
                 ];
-
-                const dadosFiltrados = dados.filter(item => !userIdsParaExcluir.includes(item.userId));
+            var dadosFiltrados = dados.filter(item => !userIdsParaExcluir.includes(item.userId));
+            
+            for(i=0; i<dadosFiltrados.length; i++){              
 
                 $("#associados_aptos").append('<option value="'+dadosFiltrados[i].userId+'">'+dadosFiltrados[i].displayName.toUpperCase()+'</option>');
                 $("#associados_aptos_1").append('<option value="'+dadosFiltrados[i].userId+'">'+dadosFiltrados[i].displayName.toUpperCase()+'</option>');
