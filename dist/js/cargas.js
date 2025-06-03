@@ -48,11 +48,26 @@ function tranforma_data_iso(dataHora) {
     await carrega_info_transacoes();
     await sleep(3000);
     await carrega_saldo();
-    await sleep(2000);
+    await sleep(3000);
     await carrega_associados_aptos(userId);
     //await envia_msg_analy();
 
 })();
+
+async function carrega_listas_associados(lista){
+    async function* asyncGenerator() {
+              var j = 0;
+              while (j < lista.length) {
+                yield j++;
+              }
+            }
+
+            for await (let i of asyncGenerator()) {            
+                $("#associados_aptos").append('<option value="'+lista[i].userId+'">'+lista[i].displayName.toUpperCase()+'</option>');
+                $("#associados_aptos_1").append('<option value="'+lista[i].userId+'">'+lista[i].displayName.toUpperCase()+'</option>');
+                $("#associados_aptos_2").append('<option value="'+lista[i].userId+'">'+lista[i].displayName.toUpperCase()+'</option>');
+            }
+}
 
 async function carrega_associados_aptos(usuario_atual){
     
@@ -80,13 +95,8 @@ async function carrega_associados_aptos(usuario_atual){
                     usuario_atual
                 ];
             var dadosFiltrados = dados.filter(item => !userIdsParaExcluir.includes(item.userId));
-            
-            for(i=0; i<dadosFiltrados.length; i++){              
 
-                $("#associados_aptos").append('<option value="'+dadosFiltrados[i].userId+'">'+dadosFiltrados[i].displayName.toUpperCase()+'</option>');
-                $("#associados_aptos_1").append('<option value="'+dadosFiltrados[i].userId+'">'+dadosFiltrados[i].displayName.toUpperCase()+'</option>');
-                $("#associados_aptos_2").append('<option value="'+dadosFiltrados[i].userId+'">'+dadosFiltrados[i].displayName.toUpperCase()+'</option>');
-            }
+            carrega_listas_associados(dadosFiltrados);
         })
         .catch(error => {
             console.log('problema na conexão com a api');
