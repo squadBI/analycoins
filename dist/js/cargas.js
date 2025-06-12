@@ -36,6 +36,8 @@ function tranforma_data_iso(dataHora) {
     analycoins_principal = Array(0);
     analycoins_transacoes = Array(0);
     saldo_usuario=0;
+    analycoins_atual_usuario=0;
+    resultado_agrup = {};
 
     userId = localStorage.getItem('userId');
     email = localStorage.getItem('email');
@@ -213,8 +215,19 @@ async function carrega_info_transacoes(){
     })
         .then(response => response.json())
         .then(data => {
-            analycoins_transacoes = JSON.parse(data.resultado);
+            analycoins_transacoes = JSON.parse(data.resultado).reverse();
             for(i=0; i<analycoins_transacoes.length; i++){
+
+                const dataOriginal = analycoins_transacoes[i].dt_transacao;
+                const data_atual = new Date(dataOriginal);
+
+                // Formatar para DD/MM/AAAA
+                const dia = String(data_atual.getDate()).padStart(2, '0');
+                const mes = String(data_atual.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+                const ano = data_atual.getFullYear();
+
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+
 
                 var nome_recebeu='';
                 for(j=0; j<analycoins_principal.length; j++){
@@ -230,16 +243,105 @@ async function carrega_info_transacoes(){
                     '</div>'+
                     '<div class="card timeline-event-card">'+
                       '<div class="card-body">'+
-                        '<div class="text-muted float-end">'+analycoins_transacoes[i].dt_transacao+'</div>'+
+                        '<div class="text-muted float-end">'+dataFormatada+'</div>'+
                         '<h4>+'+analycoins_transacoes[i].analycoins+' Analycoins para '+nome_recebeu+'</h4>'+
                         '<p class="text-muted">'+analycoins_transacoes[i].msg_reconhecimento+'</p>'+
                       '</div>'+
                     '</div>'+
                   '</li>');
             }
+
+
+            // 1. Agrupar e somar
+            const agrupado = {};
+            analycoins_transacoes.forEach(item => {
+             const comp = item.comportamento;
+             const coins = parseInt(item.analycoins, 10);
+             agrupado[comp] = (agrupado[comp] || 0) + coins;
+            });
+
+            
+            // 2. Transformar em array e calcular total
+            const total = Object.values(agrupado).reduce((acc, val) => acc + val, 0);
+            const arrayFinal = Object.entries(agrupado).map(([comp, soma]) => ({
+             comportamento: comp,
+             soma_total: soma,
+             percentual: parseFloat(((soma / total) * 100).toFixed(1))
+            }));
+
+
+            // 3. Ordenar em ordem decrescente
+            arrayFinal.sort((a, b) => b.percentual - a.percentual);
+
+            // 4. Separar em arrays finais
+            const resultadoFinal = {
+             comportamento: arrayFinal.map(item => item.comportamento),
+             soma_total: arrayFinal.map(item => item.soma_total),
+             soma_analycoins: arrayFinal.map(item => item.percentual)
+            };
+
+            var options = {
+          series: [{
+          name: 'Analycoins',
+          data: resultadoFinal.soma_analycoins
+        }],
+          chart: {
+          type: 'bar',
+          height: 350,
+          toolbar: {
+           show: false // Isso desativa toda a toolbox
+          }
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 2,
+            borderRadiusApplication: 'end',
+            horizontal: true,
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return val + '%'; // Adiciona o símbolo de porcentagem
+          }
+        },
+        colors: ['#28bea5'], // Define a cor das barras
+        grid: {
+          show: false
+        },
+        xaxis: {
+          categories: resultadoFinal.comportamento,
+          labels: {
+            show: false
+          },
+          axisBorder: {
+           show: false
+          }
+        },
+        yaxis: {
+          axisBorder: {
+           show: false
+          }
+        },
+        
+        tooltip: {
+         y: {
+         formatter: function (val, { dataPointIndex }) {
+                const valorOriginal = resultadoFinal.soma_total[dataPointIndex];
+                    return valorOriginal;
+                }
+            }
+         }
+
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart-time-info"), options);
+        chart.render();
+
+
         })
         .catch(error => {
-            console.log('problema na conexão com a api');
+            console.log('problema na conexão com a api: ', error);
         })
 
 }
@@ -248,6 +350,7 @@ async function carrega_saldo(){
     for(i=0; i<analycoins_principal.length; i++){
         if(analycoins_principal[i].userId==userId){
             saldo_usuario=analycoins_principal[i].analycoins_presente;
+            analycoins_atual_usuario=analycoins_principal[i].analycoins_recebidos;
             funcao=analycoins_principal[i].funcao;
         }
     }
@@ -292,6 +395,7 @@ async function carrega_saldo(){
     }
 
     await $("#saldo_usuario").text(saldo_usuario);
+    await $("#analycoins_atual_usuario").text(analycoins_atual_usuario);
 }
 
 $("#salvar_reconhecimento_1").click(async function(){
