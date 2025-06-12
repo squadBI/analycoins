@@ -71,7 +71,6 @@ function tranforma_data_iso(dataHora) {
                     userId
                 ];
             dadosFiltrados = dados.filter(item => !userIdsParaExcluir.includes(item.userId));
-            console.log(dadosFiltrados);
 
         })
         .catch(error => {
