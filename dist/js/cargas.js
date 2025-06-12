@@ -293,6 +293,7 @@ async function carrega_info_transacoes(){
         },
         plotOptions: {
           bar: {
+            columnWidth: '25%', // Diminui a largura das barras (padrão é 70%)
             borderRadius: 2,
             borderRadiusApplication: 'end',
             horizontal: true,
