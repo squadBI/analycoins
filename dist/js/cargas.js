@@ -70,6 +70,7 @@ function tranforma_data_iso(dataHora) {
                     '80afcec6-b1b9-43d8-a4a5-2f9a32d5f27e',
                     '9e7c7b44-2170-44c5-ad21-85218579ca2d',
                     '6f107c84-1a28-4c00-a725-1cf2bc518091',
+                    '31ec5202-4164-4e78-856f-d72bf978bf64',
                     userId
                 ];
             dadosFiltrados = dados.filter(item => !userIdsParaExcluir.includes(item.userId));
